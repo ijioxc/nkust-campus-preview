@@ -652,6 +652,40 @@ for(const n in RATE)RATE[n]={普通:'普',雷:'拉'}[RATE[n]]||RATE[n];
 // 畫面只讀校園資料 JSON（格式見 資料格式.md）：匯入過就用手機裡的，沒有就用內建範例。下面轉成各頁用的簡寫
 let DATA=null;try{DATA=JSON.parse(store.get('campus-data')||'null')}catch(e){}
 if(!DATA||DATA.format!=='campus-data')DATA=JSON.parse($('seed').textContent);
+
+// 處理書籤 / iOS 捷徑回傳的資料匯入
+if(location.hash.startsWith('#import=')){
+  try{
+    const raw=decodeURIComponent(location.hash.slice(8));
+    const inc=JSON.parse(raw);
+    if(inc.source==='elearning'){
+      if(inc.events&&inc.events.length){
+        const schEvents=(DATA.events||[]).filter(e=>e.kind==='school');
+        DATA.events=[...inc.events,...schEvents];
+      }
+      if(inc.courses&&DATA.courses){
+        inc.courses.forEach(c=>{
+          const m=DATA.courses.find(x=>x.title===c.title||x.id===c.id);
+          if(m)m.elearning=Object.assign(m.elearning||{},c.elearning||{});
+        });
+      }
+      DATA.exportedAt=inc.exportedAt;
+    }else if(inc.source==='webap'){
+      if(inc.courses&&inc.courses.length){
+        inc.courses.forEach(c=>{
+          const m=(DATA.courses||[]).find(x=>x.title===c.title);
+          if(m&&m.elearning)c.elearning=m.elearning;
+        });
+        DATA.courses=inc.courses;
+      }
+      DATA.exportedAt=inc.exportedAt;
+    }else{
+      DATA=Object.assign(DATA,inc);
+    }
+    store.set('campus-data',JSON.stringify(DATA));
+    history.replaceState(null,'',location.pathname+location.search);
+  }catch(err){console.error('匯入解析失敗',err)}
+}
 // 日期換成「11 月幾號」：10 月是 0 以下、12 月是 31 以上
 const D0=new Date(2026,10,1),dayOf=s=>{const[y,m,d]=s.split('-').map(Number);return Math.round((new Date(y,m-1,d)-D0)/864e5)+1};
 const mins=s=>{const[h,m]=s.split(':').map(Number);return h*60+m};
@@ -1081,7 +1115,16 @@ const SYS=[['選課系統','加退選、課表','https://webap.nkust.edu.tw/'],[
 // 一行一個，點了在原地展開；第三格是網址的直接開新分頁
 const MORE=[['在學證明','在學中',v('在學中')+rows([['科系','機械工程'],['學期','115-1']])],['缺曠請假','2 節',v('2 節')+rows([['缺曠','1 節'],['請假','1 節'],['線上請假','送出假單']])]];
 const OTHER=[['校園地圖','建工',rows([['建工','目前校區'],['燕巢',''],['第一',''],['楠梓',''],['旗津','']])],['作品集','↗',null,'https://ijioxc.github.io/ppt/']];
-const SET=[['文字量',()=>({full:'完整',std:'標準',min:'精簡'})[TL],textSet],['課表樣式',()=>WSTY[wStyle],wkSet],['輪盤樣式',()=>({glass:'玻璃',dot:'點陣',mix:'混合'})[DS],dialSet],['左下按鈕',()=>BTN[BS],btnSet],['登出','','<div class="s" style="margin-bottom:10px">登出後要重新登入才能更新資料。試玩版的按鈕沒有作用。</div><button class="add" type="button">登出</button>']];
+const syncSet=()=>{
+  const isCustom=DATA&&DATA.source!=='backup';
+  const time=DATA.exportedAt?new Date(DATA.exportedAt).toLocaleDateString():'';
+  return `<div class="s" style="margin-bottom:10px;line-height:1.6">目前狀態：<b>${isCustom?'已同步個人資料 ('+(DATA.source||'')+ (time?' · '+time:'')+')':'使用範例資料'}</b><br>在 iPhone 上用「捷徑」從 E-Learning 或 WebAP 即可自動匯入。</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="add" type="button" data-act="copy-shortcut">複製捷徑代碼</button>
+      ${isCustom?'<button class="add" type="button" data-act="reset-data" style="color:#d9534f">恢復範例資料</button>':''}
+    </div>`;
+};
+const SET=[['資料同步',()=>DATA.source==='backup'?'範例':'已同步',syncSet],['文字量',()=>({full:'完整',std:'標準',min:'精簡'})[TL],textSet],['課表樣式',()=>WSTY[wStyle],wkSet],['輪盤樣式',()=>({glass:'玻璃',dot:'點陣',mix:'混合'})[DS],dialSet],['左下按鈕',()=>BTN[BS],btnSet],['登出','','<div class="s" style="margin-bottom:10px">登出後要重新登入才能更新資料。試玩版的按鈕沒有作用。</div><button class="add" type="button">登出</button>']];
 // 頭貼：預設用學校系統的照片（試玩版用剪影代替），也可以自己從相簿換，存在這台裝置
 const SCHOOL=`<svg viewBox="0 0 60 70" role="img" aria-label="學校系統照片（範例）"><rect width="60" height="70" fill="#c9ced6"/><circle cx="30" cy="27" r="12" fill="#8a919c"/><path d="M8 70c2-15 11-22 22-22s20 7 22 22z" fill="#8a919c"/></svg>`;
 let AV=store.get('avatar');
@@ -1105,7 +1148,7 @@ function paintSpot(){if(dKind==='set')return paintSet();const y=$('dbody').scrol
 // 設定頁：六角形打開，每項直接攤開
 function paintSet(){$('dbody').innerHTML=SET.map(([t,,body])=>`<div class="me-sec set-sec"><div class="lbl">${t}</div>${typeof body==='function'?body():body}</div>`).join('')}
 function setText(t){TL=t;document.documentElement.dataset.text=t;store.set('text',t);repaint();paintSpot()}
-$('dbody').onclick=e=>{const o=e.target.closest('[data-open]');if(o){open=open===o.dataset.open?'':o.dataset.open;paintSpot();$('dbody').querySelector(`[data-open="${o.dataset.open}"]`).focus();return}if(e.target.closest('#stamp')&&!qrBig){avMenu=!avMenu;paintSpot();$('stamp').focus();return}if(e.target.closest('[data-av]')){AV=null;store.set('avatar','');avMenu=false;paintTab();paintSpot();return}if(e.target.closest('#qrc')){flipCard();return}const b=e.target.closest('[data-t]');if(b)setText(b.dataset.t);const d=e.target.closest('[data-ds]');if(d){DS=d.dataset.ds;document.documentElement.dataset.dial=DS;store.set('dial',DS);paintSpot()}const bs=e.target.closest('[data-bs]');if(bs){BS=bs.dataset.bs;document.documentElement.dataset.btn=BS;store.set('btn',BS);paintSpot()}const ws=e.target.closest('[data-ws]');if(ws){wStyle=ws.dataset.ws;store.set('wsty',wStyle);repaint();paintSpot()}};
+$('dbody').onclick=e=>{const act=e.target.closest('[data-act]');if(act){if(act.dataset.act==='copy-shortcut'){fetch('同步捷徑.js').then(r=>r.text()).then(t=>{navigator.clipboard.writeText(t).then(()=>alert('已複製捷徑代碼！'))}).catch(()=>alert('請開啟 同步捷徑.js 複製代碼'))}else if(act.dataset.act==='reset-data'){if(confirm('確定清除自訂資料並恢復範例？')){store.set('campus-data','');location.reload()}}return}const o=e.target.closest('[data-open]');if(o){open=open===o.dataset.open?'':o.dataset.open;paintSpot();$('dbody').querySelector(`[data-open="${o.dataset.open}"]`).focus();return}if(e.target.closest('#stamp')&&!qrBig){avMenu=!avMenu;paintSpot();$('stamp').focus();return}if(e.target.closest('[data-av]')){AV=null;store.set('avatar','');avMenu=false;paintTab();paintSpot();return}if(e.target.closest('#qrc')){flipCard();return}const b=e.target.closest('[data-t]');if(b)setText(b.dataset.t);const d=e.target.closest('[data-ds]');if(d){DS=d.dataset.ds;document.documentElement.dataset.dial=DS;store.set('dial',DS);paintSpot()}const bs=e.target.closest('[data-bs]');if(bs){BS=bs.dataset.bs;document.documentElement.dataset.btn=BS;store.set('btn',BS);paintSpot()}const ws=e.target.closest('[data-ws]');if(ws){wStyle=ws.dataset.ws;store.set('wsty',wStyle);repaint();paintSpot()}};
 // 翻面只換 class，不重畫，翻轉動畫才看得到
 function flipCard(){qrBig=!qrBig;if(qrBig)learn('card');const c=$('qrc');c.classList.toggle('flip',qrBig);c.classList.toggle('calm',(HINT.card||0)>=3);c.setAttribute('aria-pressed',qrBig);c.setAttribute('aria-label',`借書證，${qrBig?'翻回正面':'翻面放大 QR Code'}`);c.querySelector('.pc-f').setAttribute('aria-hidden',qrBig);c.querySelector('.pc-b').setAttribute('aria-hidden',!qrBig)}
 $('dbody').onkeydown=e=>{if(e.target.id==='qrc'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();flipCard()}};
