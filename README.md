@@ -5,7 +5,7 @@
 <h1 align="center">高科校園（試玩版）</h1>
 
 <p align="center">
-  給高科大學生用的課表與作業截止 App，還在設計階段，目前是<b>測試用</b>的網頁版。<br>
+  給高科大學生用的課表與作業截止 App，還在設計階段，這個網頁是<b>用於實踐程式 UI 的想像</b>。<br>
   <a href="https://ijioxc.github.io/nkust-campus-preview/"><b>打開試玩 →</b></a>
 </p>
 
