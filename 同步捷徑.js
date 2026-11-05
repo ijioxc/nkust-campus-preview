@@ -1,13 +1,3 @@
-/**
- * 高科校園 (NKUSTCampus) - iOS 捷徑 JavaScript 腳本
- * 
- * 適用對象：高科大學生
- * 執行環境：iPhone Safari 上的「捷徑 (Shortcuts)」動作「在網頁上執行 JavaScript」
- * 支援平台：
- *   1. https://elearning.nkust.edu.tw/moocs/#/home (抓取課程、作業截止、測驗、未讀公告)
- *   2. https://webap.nkust.edu.tw/nkust/ (抓取本學期課表)
- */
-
 (async function() {
   const APP_URL = "https://ijioxc.github.io/nkust-campus-preview/";
   const host = location.hostname;
@@ -38,22 +28,6 @@
             });
           }
         });
-
-        const examRes = await fetch(`/moocs/sys/api/exam/list?course_id=${cid}`).then(r => r.json()).catch(() => ({}));
-        (examRes.data || examRes.list || []).forEach(ex => {
-          if (ex.end_time) {
-            events.push({
-              id: `exam-${ex.id || ex.exam_id}`,
-              course: String(cid),
-              courseTitle: c.course_name || c.title,
-              kind: "exam",
-              title: ex.title || ex.name,
-              date: ex.end_time.slice(0, 10),
-              time: ex.end_time.slice(11, 16),
-              done: false
-            });
-          }
-        });
       }
 
       payload.source = "elearning";
@@ -64,9 +38,12 @@
       }));
       payload.events = events;
 
-      completion(`${APP_URL}#import=${encodeURIComponent(JSON.stringify(payload))}`);
+      // 直接由網頁跳轉，不用靠捷徑打開 URL
+      location.href = `${APP_URL}#import=${encodeURIComponent(JSON.stringify(payload))}`;
+      completion();
     } catch(e) {
-      completion("error: E-Learning 抓取失敗，請確認是否已在 Safari 登入！");
+      alert("E-Learning 抓取失敗，請確認已登入！");
+      completion();
     }
   } 
   // 2. WebAP 抓取課表
@@ -74,7 +51,11 @@
     try {
       const doc = window.frames['main'] ? window.frames['main'].document : document;
       const table = doc.querySelector('table[border="1"]') || doc.querySelector('.table') || doc.querySelector('table');
-      if (!table) return completion("error: 找不到課表，請先切換至「選課結果查詢／課表」頁面！");
+      if (!table) {
+        alert("找不到課表，請先點進「選課結果查詢／課表」頁面！");
+        completion();
+        return;
+      }
 
       const coursesMap = {};
       const rows = Array.from(table.querySelectorAll('tr'));
@@ -110,12 +91,15 @@
       payload.source = "webap";
       payload.courses = Object.values(coursesMap);
 
-      completion(`${APP_URL}#import=${encodeURIComponent(JSON.stringify(payload))}`);
+      location.href = `${APP_URL}#import=${encodeURIComponent(JSON.stringify(payload))}`;
+      completion();
     } catch(e) {
-      completion("error: WebAP 課表解析失敗！");
+      alert("WebAP 課表解析失敗！");
+      completion();
     }
   } 
   else {
-    completion("error: 請在高科 E-Learning 或 WebAP 網頁中執行此捷徑！");
+    alert("請在高科 E-Learning 或 WebAP 網頁中執行此捷徑！目前網址：" + location.hostname);
+    completion();
   }
 })();
