@@ -359,7 +359,7 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 .seg3 button{border:0;background:none;border-radius:14px;padding:5px 14px;font-size:13px;cursor:pointer}
 .seg3 button.on{background:var(--fg);color:var(--bg)}
 /* 左下方形「課程討論」，在「我」右邊；打開後蓋住四頁，右下輪盤換成四類（我的、本系、通識、其他） */
-#sq{position:absolute;left:var(--meR);bottom:max(8px,env(safe-area-inset-bottom,0px));width:34px;height:34px;padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:var(--fg)}
+#sq{position:absolute;left:var(--meR);bottom:max(8px,env(safe-area-inset-bottom,0px));width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:var(--fg)}
 #sq.under{visibility:hidden}
 #forum{position:absolute;inset:0;background:var(--bg);pointer-events:auto;display:flex;flex-direction:column;box-sizing:border-box;padding-top:14px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 #forum>.top{min-height:44px;margin-bottom:20px}
