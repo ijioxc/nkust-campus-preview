@@ -369,7 +369,7 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 .chead .s.tc b.god{color:var(--hot)}
 .crate .seg3 button.on.god{background:var(--hot);color:#fff}
 #stage{--dz:min(80vw,44dvh,380px)}
-#dial,#glass{position:absolute;right:0;bottom:env(safe-area-inset-bottom,0px);width:var(--dz);height:var(--dz);transform-origin:100% 100%;transition:transform .42s cubic-bezier(.22,1.18,.36,1)}
+#dial,#glass{position:absolute;right:0;bottom:0;width:var(--dz);height:var(--dz);transform-origin:100% 100%;transition:transform .42s cubic-bezier(.22,1.18,.36,1)}
 #dial{touch-action:none;cursor:pointer;display:block;outline:none;pointer-events:auto}
 /* 打開是柔和的彈簧，收起是不回彈的快速減速 */
 #dial.mid,#glass.mid{transform:scale(.8)}
@@ -408,14 +408,14 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 #dial.mini .guide,#dial.mini .hub{opacity:0}
 #sheet{transition:opacity .15s}
 #sheet.leave{opacity:0}
-#mini{position:absolute;right:0;bottom:env(safe-area-inset-bottom,0px);width:calc(var(--dz)*.25);height:calc(var(--dz)*.25);box-sizing:border-box;border-top-left-radius:100%;isolation:isolate;display:flex;align-items:flex-end;justify-content:flex-end;padding:0 max(10px,env(safe-area-inset-right,0px)) 10px 0;font-size:11px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s;text-align:right;text-shadow:0 0 3px var(--bg)}
+#mini{position:absolute;right:0;bottom:0;width:calc(var(--dz)*.25);height:calc(var(--dz)*.25);box-sizing:border-box;border-top-left-radius:100%;isolation:isolate;display:flex;align-items:flex-end;justify-content:flex-end;padding:0 max(10px,env(safe-area-inset-right,0px)) 10px 0;font-size:11px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s;text-align:right;text-shadow:0 0 3px var(--bg)}
 :root[data-dial="dot"] #mini::before{content:"";position:absolute;inset:0;z-index:-1;border-top-left-radius:100%;background:radial-gradient(circle,var(--fg) 1.1px,transparent 1.6px) 0 0/7px 7px;opacity:.38}
 #dial.mini~#mini{opacity:1}
 /* 右下角的字換成圖示：首頁是課本（課程輪盤）、學期頁是疊起來的學期、子頁面一律是返回箭頭 */
 #mini svg,#home svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 /* 設定、個人頁打開時輪盤收起來，右下角換成一顆同樣大小、同樣玻璃的返回鈕，位置跟平常一樣 */
 #mini .rays{stroke-width:1.3}
-#home{position:absolute;right:0;bottom:env(safe-area-inset-bottom,0px);width:calc(var(--dz)*.25);height:calc(var(--dz)*.25);box-sizing:border-box;border:0;margin:0;padding:0 max(10px,env(safe-area-inset-right,0px)) 10px 0;display:flex;align-items:flex-end;justify-content:flex-end;border-top-left-radius:100%;color:var(--fg);cursor:pointer;pointer-events:auto}
+#home{position:absolute;right:0;bottom:0;width:calc(var(--dz)*.25);height:calc(var(--dz)*.25);box-sizing:border-box;border:0;margin:0;padding:0 max(10px,env(safe-area-inset-right,0px)) 10px 0;display:flex;align-items:flex-end;justify-content:flex-end;border-top-left-radius:100%;color:var(--fg);cursor:pointer;pointer-events:auto}
 #home[hidden]{display:none}
 #home:active{opacity:.6}
 /* 子頁面可以從左邊緣往右滑返回上一層：直向還是正常捲動 */
@@ -423,8 +423,8 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 
 /* 左下圓形鈕「我」：點開是全螢幕個人頁；底部兩個角避開 iPhone 的 Home 橫條 */
 /* 左下三顆鈕同一條底線、一樣大、等距：六角形「設定」最左，方形「討論」中間，圓形「我」最右 */
-#stage{--me:40px;--meGap:14px;--meH:max(16px,env(safe-area-inset-left,0px));--meR:calc(var(--meH) + var(--me) + var(--meGap));--meL:calc(var(--meR) + var(--me) + var(--meGap))}
-#tab{position:absolute;left:var(--meL);bottom:max(8px,env(safe-area-inset-bottom,0px));width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:50%;font-size:14px;font-weight:600;cursor:pointer;color:var(--fg);box-shadow:0 2px 8px var(--glsh)}
+#stage{--me:40px;--meGap:14px;--meH:max(16px,env(safe-area-inset-left,0px));--meR:calc(var(--meH) + var(--me) + var(--meGap));--meL:calc(var(--meR) + var(--me) + var(--meGap));--meB:8px}
+#tab{position:absolute;left:var(--meL);bottom:var(--meB);width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:50%;font-size:14px;font-weight:600;cursor:pointer;color:var(--fg);box-shadow:0 2px 8px var(--glsh)}
 #tab.under,#hex.under,#dial.under,#glass.under,#dial.under~#mini{visibility:hidden}
 #veil{position:absolute;inset:0;background:var(--veil);pointer-events:auto}
 /* 個人頁、設定頁：和課程頁一樣蓋滿，從按下的那顆鈕的位置長出來（--ox 是那顆鈕的中心） */
@@ -487,10 +487,10 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 .seg3 button{border:0;background:none;border-radius:14px;padding:5px 14px;font-size:13px;cursor:pointer}
 .seg3 button.on{background:var(--fg);color:var(--bg)}
 /* 左下方形「課程討論」，在「我」右邊；打開後蓋住四頁，右下輪盤換成四類（我的、本系、通識、其他） */
-#sq{position:absolute;left:var(--meR);bottom:max(8px,env(safe-area-inset-bottom,0px));width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:var(--fg)}
+#sq{position:absolute;left:var(--meR);bottom:var(--meB);width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:var(--fg)}
 #sq.under{visibility:hidden}
 /* 左下六角形「設定」：用 SVG 畫六角形，和另外兩顆同色、同描邊 */
-#hex{position:absolute;left:var(--meH);bottom:max(8px,env(safe-area-inset-bottom,0px));width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:0;background:none;cursor:pointer;filter:drop-shadow(0 2px 4px var(--glsh))}
+#hex{position:absolute;left:var(--meH);bottom:var(--meB);width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:0;background:none;cursor:pointer;filter:drop-shadow(0 2px 4px var(--glsh))}
 #hex svg{display:block;width:100%;height:100%}
 /* 左下三顆鈕兩種樣式（設定「左下按鈕」切換）：a＝三顆各自一塊液態玻璃，中間細線符號；d＝三個細線符號收進同一條玻璃膠囊 */
 :root{--lgf:rgba(255,255,255,.35);--lgr:rgba(255,255,255,.9);--lgh:#fff;--lgl:rgba(255,255,255,.6);--dkf:rgba(255,255,255,.55)}
@@ -514,7 +514,7 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 :root:not([data-btn="d"]) #sq{border-radius:11px}
 :root:not([data-btn="d"]) #hex{filter:drop-shadow(0 5px 8px var(--glsh))}
 /* d 膠囊：一條玻璃膠囊墊在三顆底下，鈕本身透明，只剩符號 */
-#dock{display:none;position:absolute;left:calc(var(--meH) - 4px);bottom:calc(max(8px,env(safe-area-inset-bottom,0px)) - 4px);width:calc(var(--me)*3 + var(--meGap)*2 + 8px);height:calc(var(--me) + 8px);border-radius:999px;pointer-events:none;background:var(--dkf);-webkit-backdrop-filter:blur(10px) saturate(180%);backdrop-filter:blur(10px) saturate(180%);box-shadow:inset 0 0 0 .5px var(--lgr),inset 0 1px 0 var(--lgh),0 8px 20px var(--glsh)}
+#dock{display:none;position:absolute;left:calc(var(--meH) - 4px);bottom:calc(var(--meB) - 4px);width:calc(var(--me)*3 + var(--meGap)*2 + 8px);height:calc(var(--me) + 8px);border-radius:999px;pointer-events:none;background:var(--dkf);-webkit-backdrop-filter:blur(10px) saturate(180%);backdrop-filter:blur(10px) saturate(180%);box-shadow:inset 0 0 0 .5px var(--lgr),inset 0 1px 0 var(--lgh),0 8px 20px var(--glsh)}
 :root[data-btn="d"] #dock{display:block}
 #stage:has(#tab[hidden]) #dock,#stage:has(#tab.under) #dock{visibility:hidden}
 :root[data-btn="d"] #tab,:root[data-btn="d"] #sq{border:0;background:none;box-shadow:none}
