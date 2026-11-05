@@ -227,8 +227,6 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 #close{border:0;background:none;cursor:pointer;font-size:13px;color:var(--mute);padding:4px 0 4px 12px}
 #dt{flex:1;min-height:0;overflow:auto;cursor:pointer;padding-bottom:12px}
 #dt.full{cursor:default}
-#dt .body{max-width:66%}
-#dt.full .body{max-width:none}
 /* 課程頁：課名最大，下一件事是唯一放大的一行，之後的事照時間往下 */
 /* 頂欄和四頁一樣高、底下留一樣的空；上課時間和教室放頂欄右邊，位置和四頁的日期一樣 */
 #sheet{--lead:22px}
@@ -245,7 +243,8 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 .chead{display:flex;gap:18px;align-items:center}
 .chead h1{margin:0 0 4px}
 .chead .s{font-size:13px}
-.chead .s.tm{color:var(--fg)}
+/* 老師用前景色，上課時間、教室、學分用淡色 */
+.chead .s.tc{color:var(--fg)}
 .cmap{flex:0 0 auto;width:118px;height:118px}
 .chead+.next{margin-top:28px}
 .cbody .grp{margin-top:36px}
@@ -253,6 +252,13 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 .cbody .rows span{white-space:nowrap}
 .cbody .rows span:first-child{overflow:hidden;text-overflow:ellipsis}
 .cbody .rows .nx span:first-child{font-weight:600}
+/* 評價三段，接在資料清單下面；選中用前景色，不用橘色 */
+.crate{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px}
+.crate .seg3 button{padding:3px 9px}
+.chead .s.tc b{font-weight:700}
+/* 評價「神」用橘色：使用者指定的例外，其他評價照一般前景色 */
+.chead .s.tc b.god{color:var(--hot)}
+.crate .seg3 button.on.god{background:var(--hot);color:#fff}
 #stage{--dz:min(80vw,44dvh,380px)}
 #dial,#glass{position:absolute;right:0;bottom:env(safe-area-inset-bottom,0px);width:var(--dz);height:var(--dz);transform-origin:100% 100%;transition:transform .42s cubic-bezier(.22,1.18,.36,1)}
 #dial{touch-action:none;cursor:pointer;display:block;outline:none;pointer-events:auto}
@@ -287,21 +293,101 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
 :root[data-dial="dot"] #mini::before{content:"";position:absolute;inset:0;z-index:-1;border-top-left-radius:100%;background:radial-gradient(circle,var(--fg) 1.1px,transparent 1.6px) 0 0/7px 7px;opacity:.38}
 #dial.mini~#mini{opacity:1}
 
-/* 左下「我」抽屜；底部兩個角避開 iPhone 的 Home 橫條 */
-#tab{position:absolute;left:0;bottom:max(8px,env(safe-area-inset-bottom,0px));pointer-events:auto;border:1px solid var(--line);border-left:0;background:var(--disc);border-radius:0 10px 10px 0;padding:9px 14px 8px;padding-left:max(14px,env(safe-area-inset-left,0px));font-size:12px;font-weight:600;cursor:pointer;color:var(--fg)}
+/* 左下圓形鈕「我」：點開是全螢幕個人頁；底部兩個角避開 iPhone 的 Home 橫條 */
+/* 左下兩顆鈕同一條底線：圓形「我」貼左，方形討論鈕排在它右邊（left 用 --meR 讓位） */
+#stage{--me:44px;--meL:max(16px,env(safe-area-inset-left,0px));--meR:calc(var(--meL) + var(--me) + 10px)}
+#tab{position:absolute;left:var(--meL);bottom:max(8px,env(safe-area-inset-bottom,0px));width:var(--me);height:var(--me);padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:50%;font-size:14px;font-weight:600;cursor:pointer;color:var(--fg);box-shadow:0 2px 8px var(--glsh)}
 #tab.under,#dial.under,#glass.under,#dial.under~#mini{visibility:hidden}
 #veil{position:absolute;inset:0;background:var(--veil);pointer-events:auto}
-#drawer{position:absolute;left:0;top:0;bottom:0;width:min(84%,340px);background:var(--bg);border-right:1px solid var(--line);pointer-events:auto;box-sizing:border-box;padding-block:14px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .28s ease}
-#drawer.on{transform:none}
-/* 收起時整個隱藏：寬螢幕下抽屜的容器置中，只靠平移會露出一條邊 */
-#drawer:not(.on){visibility:hidden;transition:transform .28s ease,visibility 0s .28s}
-#dlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-#dlist button,#dlist a{border:1px solid var(--line);background:none;border-radius:16px;padding:5px 11px;font-size:13px;cursor:pointer;color:var(--fg);text-decoration:none}
-#dlist button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-#dbody{margin-top:14px;overflow:auto}
+/* 個人頁：和課程頁一樣蓋滿，從左下圓鈕的位置長出來 */
+#drawer{position:absolute;inset:0;background:var(--bg);pointer-events:auto;box-sizing:border-box;padding-top:14px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;--lead:22px;
+  clip-path:circle(0 at 38px calc(100% - 30px));transition:clip-path .34s cubic-bezier(.3,.8,.25,1)}
+#drawer.on{clip-path:circle(150% at 38px calc(100% - 30px))}
+#drawer:not(.on){visibility:hidden;transition:clip-path .26s cubic-bezier(.4,0,.2,1),visibility 0s .26s}
+#drawer>.top{min-height:44px;margin-bottom:12px}
+#dbody{flex:1;min-height:0;overflow:auto;scrollbar-width:none;padding-bottom:24px}
+#dbody::-webkit-scrollbar{display:none}
+/* 身分做成一張明信片：左邊借書證 QR，右邊頭貼當郵票、名字系級學號寫在地址線上；不放教學文字，外框呼吸燈讓人想點 */
+/* 點明信片翻面，背面是放大的 QR 給館員掃；翻過 3 次就不再呼吸 */
+.pc{position:relative;width:100%;aspect-ratio:3/2;max-height:260px;perspective:1200px;cursor:pointer;border-radius:12px;outline-offset:4px}
+.pc-in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.25,1)}
+.pc.flip .pc-in{transform:rotateY(180deg)}
+.pc-f,.pc-b{position:absolute;inset:0;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:var(--disc);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.pc-f{display:grid;grid-template-columns:1fr 1px 1.15fr;gap:14px;padding:14px}
+.pc-b{transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;background:#fff}
+.pc:not(.calm):not(.flip) .pc-f{animation:breathe 2.8s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 transparent;border-color:var(--line)}50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--fg) 10%,transparent),0 0 22px color-mix(in srgb,var(--fg) 16%,transparent);border-color:color-mix(in srgb,var(--fg) 40%,transparent)}}
+.pc-l{display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.pc-sep{background:var(--line)}
+.pc-r{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+/* QR 不管亮暗都是白底黑點，掃描器才讀得到 */
+.qr{width:min(100%,104px);aspect-ratio:1;padding:5px;background:#fff;border-radius:6px;box-sizing:border-box}
+.qr svg{display:block;width:100%;height:100%}
+.pc-b .qr{width:auto;height:86%;padding:0}
+/* 郵票：鋸齒邊用遮罩打洞，裡面是頭貼；點郵票換頭貼 */
+.stamp{position:absolute;top:0;right:0;width:62px;height:74px;padding:4px;box-sizing:border-box;border:0;background:#fff;cursor:pointer;
+  -webkit-mask:radial-gradient(3px at 3px 3px,#0000 97%,#000) -3px -3px/6px 6px round,linear-gradient(#000 0 0) content-box;mask:radial-gradient(3px at 3px 3px,#0000 97%,#000) -3px -3px/6px 6px round,linear-gradient(#000 0 0) content-box;-webkit-mask-composite:source-over;mask-composite:add}
+.stamp img,.stamp svg{display:block;width:100%;height:100%;object-fit:cover}
+/* 郵戳：壓在郵票左下角 */
+.pmark{position:absolute;z-index:1;top:40px;right:50px;width:50px;height:50px;border:1.5px solid var(--mute);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:9px/1.25 var(--mono);color:var(--mute);transform:rotate(-14deg);opacity:.75;pointer-events:none}
+.addr{display:grid;gap:6px}
+.addr div{border-bottom:1px solid var(--line);padding-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.addr .nm{font-size:19px;font-weight:600}
+.addr .dp{font-size:12px}
+/* 換頭貼：明信片下面一排兩個選項 */
+.avm{display:flex;gap:6px;margin-top:10px}
+.avm button,.avm label{border:1px solid var(--line);background:none;border-radius:16px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--fg)}
+.avm .on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+/* 左下圓鈕也用同一張頭貼 */
+#tab img,#tab svg{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover}
+#tab:has(img,svg){overflow:hidden}
+@media (prefers-reduced-motion:reduce){.pc-in{transition:none}.pc .pc-f{animation:none!important}}
+.me-sec{margin-top:36px}
+.me-sec>.lbl{padding-bottom:4px;border-bottom:1px solid var(--line);color:var(--fg);font-weight:600}
+/* 系統入口：兩欄，每格是一個外連 */
+.sys{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.sys a{display:block;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--fg);text-decoration:none;background:var(--disc)}
+.sys a b{display:block;font-size:14px;font-weight:600}
+.sys a .s{margin-top:2px}
+/* 其他項目一行一個，點了在原地展開 */
+.me-row{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:10px 0;cursor:pointer;font-size:14px;color:var(--fg);text-decoration:none;text-align:left}
+.me-row .mono{margin-left:auto;padding-left:12px}
+.me-row[aria-expanded="true"]{border-bottom-color:transparent;font-weight:600}
+.me-more{padding:4px 0 14px;border-bottom:1px solid var(--line)}
+.me-more .val{margin-top:0}
 .seg3{display:inline-flex;border:1px solid var(--line);border-radius:16px;padding:2px}
 .seg3 button{border:0;background:none;border-radius:14px;padding:5px 14px;font-size:13px;cursor:pointer}
 .seg3 button.on{background:var(--fg);color:var(--bg)}
+/* 左下方形「課程討論」，在「我」右邊；打開後蓋住四頁，右下輪盤換成四類（我的、本系、通識、其他） */
+#sq{position:absolute;left:var(--meR);bottom:max(8px,env(safe-area-inset-bottom,0px));width:34px;height:34px;padding:0;pointer-events:auto;border:1px solid var(--line);background:var(--core);border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;color:var(--fg)}
+#sq.under{visibility:hidden}
+#forum{position:absolute;inset:0;background:var(--bg);pointer-events:auto;display:flex;flex-direction:column;box-sizing:border-box;padding-top:14px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#forum>.top{min-height:44px;margin-bottom:20px}
+#fback,#fclose{border:0;background:none;cursor:pointer;font-size:13px;color:var(--mute);padding:4px 0}
+#fback{color:var(--fg)}
+/* 右下輪盤平常縮成一半停在角落，清單底下留出它的高度才捲得到最後一列 */
+#fbody{flex:1;min-height:0;overflow:auto;padding-bottom:calc(var(--dz)*.5 + 8px)}
+#forum .god{color:var(--hot)}
+.fbar{display:flex;align-items:center;gap:10px;margin:12px 0 8px;flex-wrap:wrap}
+.fbar .add{margin-left:auto}
+.fbar select{font:14px var(--sans);color:var(--fg);background:var(--disc);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.fl{margin-top:12px}
+.fsub{margin-top:4px}
+.lbl.fg{margin-top:18px}
+.frow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 0;cursor:pointer}
+.frow .l1{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.frow .l1 b{font-size:15px;font-weight:600}
+.frow .s{margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fh{font-size:19px}
+.fp{margin:14px 0 4px;line-height:1.6}
+.fre{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-top:1px solid var(--line);padding:8px 0;font-size:14px}
+.fre .mono{flex:0 0 auto}
+.fform{display:flex;gap:6px;margin-top:12px}
+.fform.col{flex-direction:column;align-items:stretch}
+.fform.col>.add{align-self:flex-end}
+.fform input,.fform textarea{font:14px var(--sans);color:var(--fg);background:var(--disc);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0;flex:1}
+.fform textarea{resize:vertical}
+.fform .crate .seg3 button.on.god{background:var(--hot);color:#fff}
 @media (prefers-reduced-motion:reduce){#dial,#glass,#drawer,#dial text,#dial .hub,#sheet,.ic{transition:none}}
 </style>
 
@@ -348,11 +434,15 @@ h1{font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:bala
     <div class="top"><span class="mono" id="crumb"></span><span class="mono when" id="cwhen" data-lv="3"></span><button id="close" hidden>關閉 ✕</button></div>
     <div id="dt"></div>
   </section>
-  <button id="tab" aria-label="打開「我」：借書證、在學證明、作品集、文字量">我</button>
+  <section id="forum" hidden aria-label="課程討論">
+    <div class="top"><span class="mono" id="fcrumb">課程討論 · 範例資料</span><button id="fback" hidden></button><button id="fclose">關閉 ✕</button></div>
+    <div id="fbody"></div>
+  </section>
+  <button id="tab" aria-label="打開個人頁：借書證、選課與學務系統、設定"></button>
+  <button id="sq" aria-label="打開課程討論：我的課、本系、通識、體育"></button>
   <div id="veil" hidden></div>
   <aside id="drawer" aria-label="我" aria-hidden="true">
     <div class="top"><span class="mono">我 · 範例資料</span><button id="dclose" class="pin">關閉 ✕</button></div>
-    <div id="dlist"></div>
     <div id="dbody"></div>
   </aside>
   <div id="glass" class="mini"></div>
@@ -380,17 +470,21 @@ const applyHints=()=>document.querySelectorAll('[data-hint]').forEach(e=>e.class
 const learn=k=>{HINT[k]=(HINT[k]||0)+1;store.set('hints',JSON.stringify(HINT));applyHints()};
 
 /* ---------- 課程 ---------- */
+const RATES=['神','佛','普','拉','刀'];let RATE={};try{RATE=JSON.parse(store.get('rate')||'{}')||{}}catch(e){}
+// 舊版存的是「普通」「雷」，換成新的字
+for(const n in RATE)RATE[n]={普通:'普',雷:'拉'}[RATE[n]]||RATE[n];
+// tc 是老師；評價是自己給的（神、普通、雷），存在手機裡
 // 課程是唯一的「東西」，今天、本週、學期、輪盤都從這裡取。k 是兩字簡稱；cat 和學期圓環同一套分類；t 是 [星期, 第幾節起, 第幾節止]
 const CAT=[['必修',66],['選修',40],['通識',28]],NEED=134;
 const COURSES=[
- {n:'英文',k:'英文',cat:'通識',cr:2,mat:3,r:'語文 102',t:[[0,'1','2']]},
- {n:'藝術欣賞',k:'藝術',cat:'通識',cr:2,mat:1,r:'人文館 401',t:[[2,'7','8']]},
- {n:'動力學',k:'動力',cat:'必修',cr:3,mat:6,r:'工學館 301',t:[[0,'5','7'],[4,'1','2']],ann:2},
- {n:'機械設計',k:'機設',cat:'必修',cr:3,mat:5,r:'工學館 205',t:[[2,'5','6']]},
- {n:'電子學',k:'電子',cat:'必修',cr:3,mat:9,r:'電機館 210',t:[[1,'2','4'],[3,'5','8']]},
- {n:'流體力學',k:'流體',cat:'必修',cr:3,mat:4,r:'工學館 105',t:[[2,'2','4'],[4,'5','6']]},
- {n:'電腦繪圖',k:'繪圖',cat:'選修',cr:2,mat:3,r:'電腦教室 3',t:[[1,'6','7']]},
- {n:'熱傳學',k:'熱傳',cat:'選修',cr:3,mat:2,r:'工學館 302',t:[[3,'2','3']]}];
+ {n:'英文',k:'英文',tc:'林雅婷',cat:'通識',cr:2,mat:3,r:'語文 102',t:[[0,'1','2']]},
+ {n:'藝術欣賞',k:'藝術',tc:'陳美玲',cat:'通識',cr:2,mat:1,r:'人文館 401',t:[[2,'7','8']]},
+ {n:'動力學',k:'動力',tc:'王建國',cat:'必修',cr:3,mat:6,r:'工學館 301',t:[[0,'5','7'],[4,'1','2']],ann:2},
+ {n:'機械設計',k:'機設',tc:'李志明',cat:'必修',cr:3,mat:5,r:'工學館 205',t:[[2,'5','6']]},
+ {n:'電子學',k:'電子',tc:'張文華',cat:'必修',cr:3,mat:9,r:'電機館 210',t:[[1,'2','4'],[3,'5','8']]},
+ {n:'流體力學',k:'流體',tc:'黃俊傑',cat:'必修',cr:3,mat:4,r:'工學館 105',t:[[2,'2','4'],[4,'5','6']]},
+ {n:'電腦繪圖',k:'繪圖',tc:'吳宗翰',cat:'選修',cr:2,mat:3,r:'電腦教室 3',t:[[1,'6','7']]},
+ {n:'熱傳學',k:'熱傳',tc:'劉家豪',cat:'選修',cr:3,mat:2,r:'工學館 302',t:[[3,'2','3']]}];
 const PER={M:[430,480],1:[490,540],2:[550,600],3:[610,660],4:[670,720],A:[730,780],5:[810,860],6:[870,920],7:[930,980],8:[990,1040],9:[1050,1100],10:[1110,1160],11:[1165,1215],12:[1220,1270],13:[1275,1325]};
 const ORDER=['M','1','2','3','4','A','5','6','7','8','9','10','11','12','13'];
 const SHORT=n=>(COURSES.find(c=>c.n===n)||{}).k||n.slice(0,2);
@@ -597,6 +691,8 @@ $('app').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)
 // 兩層：右下角圓心是返回，外圈一圈是全部的課，由上往下 必修 → 選修 → 通識；類和類之間空一小段，靠顏色分類
 const RING=CAT.flatMap(([n])=>COURSES.filter(c=>c.cat===n));
 const NS='http://www.w3.org/2000/svg',S=$('dial'),CC=300,TOP=262,SPAN=80,HUB=72,RT=268,GAP=.5;let ac,mode='closed',it=-1,hub=false,kind='course',big=false;
+// sem 和 disc 都是只有一類的輪盤：學期頁選學期、討論頁選四類；cur 是目前選的那一個
+const flat=()=>kind==='sem'||kind==='disc',cur=()=>kind==='sem'?si:di,setCur=i=>kind==='sem'?setSem(i):setDisc(i);
 const P=(r,a)=>[CC+r*Math.cos(a*Math.PI/180),CC+r*Math.sin(a*Math.PI/180)];
 const el=(n,o,p=S)=>{const e=document.createElementNS(NS,n);for(const k in o)e.setAttribute(k,o[k]);p.append(e);return e};
 // 角度表：每個選項一格，分類之間空 GAP 格；W 是一格的角度
@@ -604,25 +700,25 @@ let ANG=[],W=0;
 function layout(gs){const U=gs.reduce((s,[,n])=>s+n+(gs.length>1?GAP:0),0);W=SPAN/U;let u=0;ANG=[];
   gs.forEach(([,n])=>{if(gs.length>1)u+=GAP;for(let i=0;i<n;i++){ANG.push(TOP-(u+.5)*W);u++}})}
 // 手指離哪個選項的角度最近就選哪個；已選的那個多給 0.35 格，交界不會來回跳
-function pick(a){let b=0;ANG.forEach((x,i)=>{if(Math.abs(a-x)<Math.abs(a-ANG[b]))b=i});const c=kind==='sem'?si:it;return c>=0&&Math.abs(a-ANG[c])<=Math.abs(a-ANG[b])+W*.35?c:b}
+function pick(a){let b=0;ANG.forEach((x,i)=>{if(Math.abs(a-x)<Math.abs(a-ANG[b]))b=i});const c=flat()?cur():it;return c>=0&&Math.abs(a-ANG[c])<=Math.abs(a-ANG[b])+W*.35?c:b}
 const arcD=r=>{const[x0,y0]=P(r,270),[x1,y1]=P(r,180);return`M${x0} ${y0}A${r} ${r} 0 0 0 ${x1} ${y1}`};
 // 扇形：內外兩條弧夾住一格寬，內緣貼著返回區
 const FI=HUB+6,FO=296,sector=a=>{const h=W/2-.3,[x1,y1]=P(FO,a+h),[x2,y2]=P(FO,a-h),[x3,y3]=P(FI,a-h),[x4,y4]=P(FI,a+h);return`M${x1} ${y1}A${FO} ${FO} 0 0 0 ${x2} ${y2}L${x3} ${y3}A${FI} ${FI} 0 0 1 ${x4} ${y4}Z`};
 const radial=(t,a,cls)=>{const[x,y]=P(RT,a),e=el('text',{x,y,class:cls,'text-anchor':'start','dominant-baseline':'middle',transform:`rotate(${a-180} ${x} ${y})`});e.textContent=t;return e};
 let IT=[],HB,IND,WG;
 // 不畫實心圓：只有沿弧排的字；點陣樣式另外有兩條點線當路標
-function build(){S.innerHTML='';S.classList.toggle('sem',kind==='sem');
-  layout(kind==='sem'?[['',SEM.length]]:CAT.map(([n])=>[n,RING.filter(c=>c.cat===n).length]).filter(x=>x[1]));
+function build(){S.innerHTML='';S.classList.toggle('sem',flat());
+  layout(flat()?[['',kind==='sem'?SEM.length:DISC.length]]:CAT.map(([n])=>[n,RING.filter(c=>c.cat===n).length]).filter(x=>x[1]));
   el('path',{d:arcD(HUB),class:'guide'});el('path',{d:arcD(290),class:'guide'});
-  WG=el('path',{class:'wedge',opacity:0});IT=(kind==='sem'?SEM.map(s=>s.id):RING.map(c=>c.n)).map((n,i)=>({t:radial(n,ANG[i],'ri')}));IND=el('circle',{cx:0,cy:0,r:0,class:'mk'});ia=null;ir=0;
+  WG=el('path',{class:'wedge',opacity:0});IT=(kind==='sem'?SEM.map(s=>s.id):kind==='disc'?DISC:RING.map(c=>c.n)).map((n,i)=>({t:radial(n,ANG[i],'ri')}));IND=el('circle',{cx:0,cy:0,r:0,class:'mk'});ia=null;ir=0;
   const[hx,hy]=P(34,225);HB=el('g',{class:'hub'},el('g',{transform:`translate(${hx} ${hy})`}));el('text',{class:'hg','text-anchor':'middle','dominant-baseline':'central'},HB).textContent='↩'}
 function tick(f=1500){navigator.vibrate?.(4);try{ac=ac||new AudioContext();const o=ac.createOscillator(),gn=ac.createGain();o.frequency.value=f;gn.gain.setValueAtTime(.05,ac.currentTime);gn.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.025);o.connect(gn).connect(ac.destination);o.start();o.stop(ac.currentTime+.03)}catch(e){}}
 // 手指所在那一類的課全部變亮，選中的那門變橘色、稍微放大；其他類保持暗灰。手指回到圓心時全部變暗、返回符號放大
 // 學期輪盤只有一類，所以全部亮、選中的橘色
-const catOf=i=>kind==='sem'?0:RING[i].cat;
+const catOf=i=>flat()?0:RING[i].cat;
 // 學期頁沒按著時是小尺寸：字放大一點抵銷縮小，目前的學期照樣標橘色
-const small=()=>kind==='sem'&&mode==='closed';
-function mark(){const b=mode==='browse',sm=small(),c=kind==='sem'?si:it,on=(b||sm)&&c>=0&&!hub;
+const small=()=>flat()&&mode==='closed';
+function mark(){const b=mode==='browse',sm=small(),c=flat()?cur():it,on=(b||sm)&&c>=0&&!hub;
   IT.forEach((r,i)=>{const sel=on&&i===c,lit=!b||c<0||(on&&catOf(i)===catOf(c));
     r.t.style.fontSize=(sel?18:15)*(sm?1.7:1)+'px';r.t.style.fontWeight=sel?700:lit?500:400;r.t.style.fill=sel?'var(--hot)':lit&&!hub?'var(--fg)':'var(--dim)';r.t.style.opacity=''});
   // 扇形和選取點只在手指按著時出現，一格一格鎖在選中的那門課上
@@ -659,28 +755,25 @@ function courseGrp(k,t,xs,nx,nm){const n=xs.filter(past).length,L=2*Math.PI*18,a
   else{mid=xs.length-n;f=n/xs.length;say=`還有 ${mid} 項沒交，交了 ${n} / ${xs.length}`;side=`交了 ${n} / ${xs.length}`}
   return`<div class="cg"><svg class="sring" viewBox="2 2 40 40" role="img" aria-label="${t}：${say}">${a(1,'var(--rail)')}${a(f,'var(--fg)')}<text x="22" y="23" text-anchor="middle" dominant-baseline="middle" font-size="11" font-family="Doto,ui-monospace,monospace" font-weight="800">${mid}</text></svg>
     <div><div class="lbl"><span class="bh">${icon(k)}${t}</span><span data-lv="3">${side}</span></div><div class="rows">${xs.map(x=>`<div class="${past(x)?'gone':''}${x===nx?' nx':''}"><span>${nm(x)}</span><span>${x.m===1439?when({day:x.day}):when(x)}</span></div>`).join('')}</div></div></div>`}
-function coursePage(c,full){const xs=nextOf(c.n),nx=xs[0],rest=xs.slice(1,full?99:3),nm=x=>x.n.replace(c.n+' ','');
-  if(full){const all=EV.filter(x=>x.c===c.n).sort(byTime),g=k=>all.filter(x=>x.k===k);
-    let h=`<div class="chead">${courseMap(c)}<div><h1>${c.n}</h1>${c.t.map(([d,a,b])=>`<div class="s tm">週${WD[d]} ${a}–${b} 節 · ${hm(PER[a][0])}</div>`).join('')}<div class="s">${c.r}</div><div class="s">${c.cr} 學分 · ${c.cat}</div></div></div>`;
-    h+=nx?`<div class="next">${icon(nx.k)}<span>${nm(nx)}</span><span class="mono">${when(nx)}</span></div>`:'<div class="next"><span class="s">接下來沒有作業和考試</span></div>';
-    h+='<div class="grp">'+[['ex','考試'],['hw','作業']].filter(([k])=>g(k).length).map(([k,t])=>courseGrp(k,t,g(k),nx,nm)).join('')+'</div>';
-    h+=`<div class="grp"><div class="cg"><div></div><div>${lbl('資料')}${rows([['教材',c.mat+' 份'],...(c.ann?[['教學平台',c.ann+' 則新公告']]:[])])}</div></div></div>`;
-    return`<div class="cbody">${h}</div>`}
-  let h=`<h1>${c.n}</h1>`;
-  h+=nx?`<div class="next">${icon(nx.k)}<span>${nm(nx)}</span><span class="mono">${when(nx)}</span></div>`:'<div class="next"><span class="s">近期沒有作業和考試</span></div>';
-  h+=rest.map(x=>`<div class="cev">${icon(x.k)}<span>${nm(x)}</span><span class="w">${when(x)}</span></div>`).join('');
-  return h}
+// 按著輪盤預覽和放開後的完整頁用同一套排法，滑到哪門課就看到那門課完整的樣子；在扇形外放開照樣返回
+function coursePage(c){const nx=nextOf(c.n)[0],nm=x=>x.n.replace(c.n+' ',''),all=EV.filter(x=>x.c===c.n).sort(byTime),g=k=>all.filter(x=>x.k===k);
+  let h=`<div class="chead">${courseMap(c)}<div><h1>${c.n}</h1><div class="s tc">${c.tc} 老師${RATE[c.n]?` · <b${RATE[c.n]==='神'?' class="god"':''}>${RATE[c.n]}</b>`:''}</div>${c.t.map(([d,a,b])=>`<div class="s">週${WD[d]} ${a}–${b} 節 · ${hm(PER[a][0])}</div>`).join('')}<div class="s">${c.r}</div><div class="s">${c.cr} 學分 · ${c.cat}</div></div></div>`;
+  h+=nx?`<div class="next">${icon(nx.k)}<span>${nm(nx)}</span><span class="mono">${when(nx)}</span></div>`:'<div class="next"><span class="s">接下來沒有作業和考試</span></div>';
+  h+='<div class="grp">'+[['ex','考試'],['hw','作業']].filter(([k])=>g(k).length).map(([k,t])=>courseGrp(k,t,g(k),nx,nm)).join('')+'</div>';
+  h+=`<div class="grp"><div class="cg"><div></div><div>${lbl('資料')}${rows([['教材',c.mat+' 份'],...(c.ann?[['教學平台',c.ann+' 則新公告']]:[])])}<div class="crate"><span>評價</span><span class="seg3" role="group" aria-label="評價 ${c.tc} 老師">${RATES.map(r=>`<button data-rate="${r}" class="${RATE[c.n]===r?'on':''}${r==='神'?' god':''}" aria-pressed="${RATE[c.n]===r}">${r}</button>`).join('')}</span></div></div></div></div>`;
+  return`<div class="cbody">${h}</div>`}
 // 三個狀態：closed 只看時間頁；browse 輪盤放大、上方預覽；open 完整課程頁、輪盤縮小，點一下就返回
-function show(){const b=mode==='browse',full=mode==='open';S.classList.toggle('mini',!b&&!small());S.classList.toggle('sm',small());S.classList.toggle('mid',b&&!big);$('tab').classList.toggle('under',b);$('sheet').classList.toggle('leave',b&&hub);
+function show(){const b=mode==='browse',full=mode==='open';S.classList.toggle('mini',!b&&!small());S.classList.toggle('sm',small());S.classList.toggle('mid',b&&!big);$('tab').classList.toggle('under',b);$('sq').classList.toggle('under',b);$('sheet').classList.toggle('leave',b&&hub);
   if(kind==='sem'){$('sheet').hidden=true;$('mini').textContent='學期';S.setAttribute('aria-label','學期：'+SEM[si].id);return}
+  if(kind==='disc'){$('sheet').hidden=true;$('mini').textContent='分類';S.setAttribute('aria-label','課程討論分類：'+DISC[di]);return}
   $('sheet').hidden=mode==='closed';$('mini').textContent=full?'↩ 返回':'課程';
   const hint=t=>`<div class="mono" style="margin-top:12px" data-lv="4" data-hint="dialrel">${t} · 滑出扇形或滑回右下角放開就返回</div>`,c=RING[it];let crumb,body;
-  if(c){crumb=`${c.cat} · 範例資料${full?'':' · 預覽'}`;body=coursePage(c,full)+(full?'':hint('放開就打開這門課'))}
+  if(c){crumb=`${c.cat} · 範例資料${full?'':' · 預覽'}`;body=coursePage(c)+(full?'':hint('放開就打開這門課'))}
   else{crumb='課程';body=`<h1>本學期 ${COURSES.length} 門課</h1>${rows(RING.map(c=>{const x=nextOf(c.n)[0];return[c.n,x?when(x):'']}))}${hint('滑到一門課再放開就打開')}`}
   if(b&&hub)crumb='放開返回';
   // 頂欄右邊兩行：上課時間、教室和學分
-  // 完整頁的時間教室學分寫在課名旁邊，頂欄右邊只在預覽時用
-  $('cwhen').innerHTML=c&&!full?`${c.t.map(([d,a,b])=>`週${WD[d]} ${a}–${b} 節`).join(' · ')}<br>${c.r} · ${c.cr} 學分`:'';
+  // 時間教室學分寫在課名旁邊，頂欄右邊不再重複
+  $('cwhen').innerHTML='';
   $('crumb').textContent=crumb;S.setAttribute('aria-label','課程：'+crumb);$('dt').classList.toggle('full',full);$('dt').innerHTML=`<div class="body">${body}</div>`;applyHints()}
 // 打開輪盤時先停在跟目前這頁有關的課：今天頁是正在上或下一堂，本週頁是最近截止的那門
 function guess(){const pg=Math.round($('app').scrollTop/$('app').clientHeight);let n=null;
@@ -689,32 +782,34 @@ function guess(){const pg=Math.round($('app').scrollTop/$('app').clientHeight);l
   it=n?RING.findIndex(c=>c.n===n):-1}
 // 打開時課名從上到下依序淡入，像沿著弧線掃過去
 function sweep(){if(!RM.matches)IT.forEach((r,i)=>[r.t].forEach(e=>e.animate([{opacity:0},{opacity:1}],{duration:220,delay:60+i*24,easing:'ease-out',fill:'backwards'})))}
-function setMode(m){if(m==='browse'&&mode!=='browse'){big=false;if(kind!=='sem')guess();sweep()}if(m==='open'&&mode!=='open')learn('open');mode=m;if(m!=='browse')hub=false;mark();show()}
+function setMode(m){if(m==='browse'&&mode!=='browse'){big=false;if(!flat())guess();sweep()}if(m==='open'&&mode!=='open')learn('open');mode=m;if(m!=='browse')hub=false;mark();show()}
 function openCourse(n){const i=RING.findIndex(c=>c.n===n);if(i<0)return;it=i;setMode('open')}
 function polar(e){const p=S.getBoundingClientRect(),k=300/p.width,x=(e.clientX-p.right)*k,y=(e.clientY-p.bottom)*k;let a=Math.atan2(y,x)*180/Math.PI;if(a<0)a+=360;return{a,r:Math.hypot(x,y)}}
 // 手指在不在某一門課的扇形上：拉出外緣、拉過最上或最左那門、停在兩類之間的空隙，都算不在
 const onFan=q=>q.r<=FO&&ANG.some(x=>Math.abs(q.a-x)<=W/2);
 // 圓心是返回，外面是選項；在扇形外放開也是返回。學期輪盤一離開扇形就換回按下時的學期，放開不會停在途中經過的那個。回傳這一步有沒有換東西
 function move(q){const h=q.r<HUB||!onFan(q);let ch=h!==hub;hub=h;
-  if(h&&kind==='sem'&&dn&&si!==dn.s0){setSem(dn.s0);ch=true}
-  if(!h){const i=pick(q.a);if(kind==='sem'){if(i!==si){setSem(i);learn('semdial');ch=true}}else if(i!==it){it=i;ch=true}}
-  if(ch){mark();show();ripple(h?-1:kind==='sem'?si:it)}return ch}
+  if(h&&flat()&&dn&&cur()!==dn.s0){setCur(dn.s0);ch=true}
+  if(!h){const i=pick(q.a);if(flat()){if(i!==cur()){setCur(i);learn(kind==='sem'?'semdial':'disc');ch=true}}else if(i!==it){it=i;ch=true}}
+  if(ch){mark();show();ripple(h?-1:flat()?cur():it)}return ch}
 // 按下縮小的輪盤：放大，手指還停在圓心。放開時在課上就打開那門課，在圓心就返回
 // 從縮小狀態點一下不滑：closed 時是打開輪盤，open 時是返回
 let dn=null;
-S.onpointerdown=e=>{S.setPointerCapture?.(e.pointerId);dn={from:mode,moved:false,s0:si};if(mode!=='browse'){setMode('browse');hub=true;mark();show()}else move(polar(e))};
+S.onpointerdown=e=>{S.setPointerCapture?.(e.pointerId);dn={from:mode,moved:false,s0:flat()?cur():si};if(mode!=='browse'){setMode('browse');hub=true;mark();show()}else move(polar(e))};
 // 只有兩段：打開是中尺寸，手指拉到中尺寸外緣再出去一點就換成大尺寸，這次操作內不再縮回去
 S.onpointermove=e=>{if(!dn)return;if(!big&&mode==='browse'){const p=S.getBoundingClientRect();if(Math.hypot(e.clientX-p.right,e.clientY-p.bottom)>parseFloat(getComputedStyle(S).width)*.84){big=true;show()}}if(move(polar(e))){dn.moved=true;tick(hub?700:1500)}};
 S.onpointerup=()=>{if(!dn)return;const d=dn;dn=null;
-  if(kind==='sem'){hub=false;if(d.from==='browse'||d.moved)setMode('closed');else mark();return}
+  if(flat()){hub=false;if(d.from==='browse'||d.moved)setMode('closed');else mark();return}
   if(hub){hub=false;if(d.from==='closed'&&!d.moved){mark();show()}else{learn('dialrel');setMode('closed')}}
   else if(it>=0){learn('dialrel');setMode('open')}};
 S.onpointercancel=()=>{dn=null;hub=false;mark();show()};
-$('dt').onclick=()=>{if(mode==='browse'&&it>=0)setMode('open')};
+// 點評價：再點一次同一個就取消；預覽時點評價不會順便打開課程頁
+$('dt').onclick=e=>{const b=e.target.closest('[data-rate]');if(b&&it>=0){const n=RING[it].n;if(RATE[n]===b.dataset.rate)delete RATE[n];else RATE[n]=b.dataset.rate;store.set('rate',JSON.stringify(RATE));show();return}
+  if(mode==='browse'&&it>=0)setMode('open')};
 $('close').onclick=()=>setMode('closed');
 // 鍵盤：方向鍵依序走過全部的課，Esc 在任何地方都是返回
 S.onkeydown=e=>{const d={ArrowDown:1,ArrowLeft:1,ArrowUp:-1,ArrowRight:-1}[e.key];
-  if(kind==='sem'){if(d){e.preventDefault();if(mode!=='browse')setMode('browse');setSem(si+d);tick();mark()}return}
+  if(flat()){if(d){e.preventDefault();if(mode!=='browse')setMode('browse');setCur(cur()+d);tick();mark()}return}
   if(e.key==='Enter'||e.key===' '){e.preventDefault();setMode(mode==='browse'&&it>=0?'open':'browse')}
   if(d){e.preventDefault();if(mode!=='browse')setMode('browse');it=Math.max(0,Math.min(RING.length-1,it<0?0:it+d));tick();mark();show()}};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mode!=='closed'&&!$('drawer').classList.contains('on'))setMode('closed')});
@@ -723,10 +818,9 @@ new MutationObserver(()=>$('glass').setAttribute('class',S.getAttribute('class')
 build();
 // 翻到學期頁，輪盤換成學期，但平常縮在角落不擋成績；手指按上去才放大，放開縮回。離開學期頁就換回課程
 function setKind(k){kind=k;hub=false;it=-1;build();setMode('closed')}
-let pT=0;$('app').addEventListener('scroll',()=>{clearTimeout(pT);pT=setTimeout(()=>{const k=Math.round($('app').scrollTop/$('app').clientHeight)===3?'sem':'course';if(k!==kind)setKind(k)},120)});
+let pT=0;$('app').addEventListener('scroll',()=>{clearTimeout(pT);pT=setTimeout(()=>{if(kind==='disc')return;const k=Math.round($('app').scrollTop/$('app').clientHeight)===3?'sem':'course';if(k!==kind)setKind(k)},120)});
 
 /* ---------- 左下「我」 ---------- */
-const bar=`<svg width="200" height="64" style="display:block;margin-top:6px" role="img" aria-label="範例條碼">${Array.from({length:32},(_,i)=>`<rect x="${i*6.2}" width="${i%3?2:4}" height="64" fill="var(--fg)"/>`).join('')}</svg><div class="mono" style="margin-top:6px">範例條碼，不能使用</div>`;
 const textSet=()=>`<div class="seg3" role="radiogroup" aria-label="文字量">${[['full','完整'],['std','標準'],['min','精簡']].map(([k,t])=>`<button role="radio" aria-checked="${k===TL}" data-t="${k}"${k===TL?' class="on"':''}>${t}</button>`).join('')}</div>
   <div class="s" style="margin-top:10px;line-height:1.6">完整：全部說明和教學提示<br>標準：拿掉教學提示<br>精簡：只留一句話和名稱，其他看點和圖示</div>
   <div class="s" data-lv="4" style="margin-top:10px">教學提示做過 3 次就會自己消失。用滿兩週時會問你一次要不要改成標準。</div>`;
@@ -734,18 +828,137 @@ const dialSet=()=>`<div class="seg3" role="radiogroup" aria-label="輪盤樣式"
   <div class="s" style="margin-top:10px;line-height:1.6">玻璃：iOS 液態玻璃底<br>點陣：沒有底，只有字和點<br>混合：玻璃底加點陣標記</div>
   <div class="lbl" style="margin-top:16px">玻璃扇形</div><div class="seg3" role="radiogroup" aria-label="玻璃扇形">${[['on','開'],['off','關']].map(([k,t])=>`<button role="radio" aria-checked="${k===BB}" data-bb="${k}"${k===BB?' class="on"':''}>${t}</button>`).join('')}</div>
   <div class="s" style="margin-top:10px">手指按上去才出現，從圓心到外圈的一片玻璃，一格一格鎖在選中的課上</div>`;
-// 第三格是網址的項目直接開新分頁；之後給同學用時改成自己填網址，沒填就不顯示
-const SPOT=[['借書證','<div class="s">出示條碼給館員</div>'+bar],['在學證明',v('在學中')+rows([['科系','機械工程'],['學期','115-1']])],['缺曠請假',v('2 節')+rows([['缺曠','1 節'],['請假','1 節'],['線上請假','送出假單']])],['校園地圖',rows([['建工','目前校區'],['燕巢',''],['第一',''],['楠梓',''],['旗津','']])],
- ['作品集 ↗',null,'https://ijioxc.github.io/ppt/'],['文字量',textSet],['輪盤樣式',dialSet],['登出','<div class="s" style="margin-bottom:10px">登出後要重新登入才能更新資料。試玩版的按鈕沒有作用。</div><button class="add" type="button">登出</button>']];
-let sp=0;
-SPOT.forEach((x,i)=>{const b=document.createElement(x[2]?'a':'button');b.textContent=x[0];if(x[2]){b.href=x[2];b.target='_blank';b.rel='noopener'}else b.onclick=()=>{sp=i;paintSpot()};$('dlist').append(b)});
-function paintSpot(){[...$('dlist').children].forEach((b,i)=>b.classList.toggle('on',i===sp));const x=SPOT[sp][1];$('dbody').innerHTML=typeof x==='function'?x():x}
+/* 個人頁：上面身分和借書證，下面系統入口、證明請假、其他、設定 */
+const ME={name:'王小明',dept:'機械工程系',yr:'三年級',id:'C1110000'};
+// 範例 QR：25×25 格，三個角是定位方塊，其他格用固定種子亂數填，看起來像 QR 但掃不出東西
+const qr=(()=>{const n=25,f=(x,y)=>[[0,0],[n-7,0],[0,n-7]].find(([a,b])=>x>=a&&x<a+7&&y>=b&&y<b+7);let s=7,r='';
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){const c=f(x,y);let on;if(c){const dx=x-c[0],dy=y-c[1];on=dx===0||dy===0||dx===6||dy===6||(dx>1&&dx<5&&dy>1&&dy<5)}else{s=(s*16807)%2147483647;on=!f(x-1,y)&&!f(x,y-1)&&!f(x+1,y)&&!f(x,y+1)&&s%5<2}if(on)r+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}
+  return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" fill="#111" role="img" aria-label="範例借書證 QR Code">${r}</svg>`})();
+// 系統入口：網址先放校務系統和教學平台首頁，之後給同學用時改成正確的直連
+const SYS=[['選課系統','加退選、課表','https://webap.nkust.edu.tw/'],['學務系統','缺曠、請假、獎懲','https://webap.nkust.edu.tw/'],['教學平台','講義、繳交作業','https://elearning.nkust.edu.tw/']];
+// 一行一個，點了在原地展開；第三格是網址的直接開新分頁
+const MORE=[['在學證明','在學中',v('在學中')+rows([['科系','機械工程'],['學期','115-1']])],['缺曠請假','2 節',v('2 節')+rows([['缺曠','1 節'],['請假','1 節'],['線上請假','送出假單']])]];
+const OTHER=[['校園地圖','建工',rows([['建工','目前校區'],['燕巢',''],['第一',''],['楠梓',''],['旗津','']])],['作品集','↗',null,'https://ijioxc.github.io/ppt/']];
+const SET=[['文字量',()=>({full:'完整',std:'標準',min:'精簡'})[TL],textSet],['輪盤樣式',()=>({glass:'玻璃',dot:'點陣',mix:'混合'})[DS],dialSet],['登出','','<div class="s" style="margin-bottom:10px">登出後要重新登入才能更新資料。試玩版的按鈕沒有作用。</div><button class="add" type="button">登出</button>']];
+// 頭貼：預設用學校系統的照片（試玩版用剪影代替），也可以自己從相簿換，存在這台裝置
+const SCHOOL=`<svg viewBox="0 0 60 70" role="img" aria-label="學校系統照片（範例）"><rect width="60" height="70" fill="#c9ced6"/><circle cx="30" cy="27" r="12" fill="#8a919c"/><path d="M8 70c2-15 11-22 22-22s20 7 22 22z" fill="#8a919c"/></svg>`;
+let AV=store.get('avatar');
+const avatar=()=>AV?`<img src="${AV}" alt="我的頭貼">`:SCHOOL;
+const paintTab=()=>{};
+function pickPhoto(f){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),z=240,s=Math.min(im.width,im.height);c.width=c.height=z;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,z,z);AV=c.toDataURL('image/jpeg',.85);store.set('avatar',AV);paintTab();paintSpot()};im.src=r.result};r.readAsDataURL(f)}
+let open='',qrBig=false,avMenu=false;
+const meRow=([t,m,body,url])=>{const mm=typeof m==='function'?m():m;
+  if(url)return `<a class="me-row" href="${url}" target="_blank" rel="noopener"><span>${t}</span><span class="mono">${mm}</span></a>`;
+  const on=open===t;return `<button class="me-row" data-open="${t}" aria-expanded="${on}"><span>${t}</span><span class="mono">${on?'收起':mm}</span></button>${on?`<div class="me-more">${typeof body==='function'?body():body}</div>`:''}`};
+const meSec=(h,a)=>`<div class="me-sec"><div class="lbl">${h}</div>${a.map(meRow).join('')}</div>`;
+function paintSpot(){const y=$('dbody').scrollTop;$('dbody').innerHTML=`<div class="pc${qrBig?' flip':''}${(HINT.card||0)>=3?' calm':''}" id="qrc" role="button" tabindex="0" aria-pressed="${qrBig}" aria-label="借書證，${qrBig?'翻回正面':'翻面放大 QR Code'}"><div class="pc-in">
+    <div class="pc-f" aria-hidden="${qrBig}"><div class="pc-l"><div class="qr">${qr}</div><span class="mono">借書證 · 範例</span></div><i class="pc-sep"></i>
+      <div class="pc-r"><button class="stamp" id="stamp" aria-label="換頭貼" aria-expanded="${avMenu}">${avatar()}</button><span class="pmark" aria-hidden="true">高科大<b>115-1</b></span>
+        <div class="addr"><div class="nm">${ME.name}</div><div class="dp">${ME.dept} ${ME.yr}</div><div class="mono">${ME.id}</div></div></div></div>
+    <div class="pc-b" aria-hidden="${!qrBig}"><div class="qr">${qr}</div></div></div></div>
+  ${avMenu?`<div class="avm" role="group" aria-label="頭貼來源"><button data-av="school"${AV?'':' class="on"'}>學校照片</button><label${AV?' class="on"':''}>從相簿選<input type="file" accept="image/*" id="avf" hidden></label></div>`:''}
+  <div class="me-sec"><div class="lbl">系統</div><div class="sys">${SYS.map(([t,s,u])=>`<a href="${u}" target="_blank" rel="noopener"><b>${t} ↗</b><div class="s">${s}</div></a>`).join('')}</div></div>
+  ${meSec('證明・請假',MORE)}${meSec('其他',OTHER)}${meSec('設定',SET)}`;$('dbody').scrollTop=y}
 function setText(t){TL=t;document.documentElement.dataset.text=t;store.set('text',t);repaint();paintSpot()}
-$('dbody').onclick=e=>{const b=e.target.closest('[data-t]');if(b)setText(b.dataset.t);const d=e.target.closest('[data-ds]');if(d){DS=d.dataset.ds;document.documentElement.dataset.dial=DS;store.set('dial',DS);paintSpot()}const q=e.target.closest('[data-bb]');if(q){BB=q.dataset.bb;document.documentElement.dataset.bub=BB;store.set('fan',BB);paintSpot()}};
-function drawer(on){$('drawer').classList.toggle('on',on);$('drawer').setAttribute('aria-hidden',!on);$('veil').hidden=!on;$('tab').hidden=on;S.classList.toggle('under',on);if(on)$('dlist').children[sp].focus();else $('tab').focus()}
+$('dbody').onclick=e=>{const o=e.target.closest('[data-open]');if(o){open=open===o.dataset.open?'':o.dataset.open;paintSpot();$('dbody').querySelector(`[data-open="${o.dataset.open}"]`).focus();return}if(e.target.closest('#stamp')&&!qrBig){avMenu=!avMenu;paintSpot();$('stamp').focus();return}if(e.target.closest('[data-av]')){AV=null;store.set('avatar','');avMenu=false;paintTab();paintSpot();return}if(e.target.closest('#qrc')){flipCard();return}const b=e.target.closest('[data-t]');if(b)setText(b.dataset.t);const d=e.target.closest('[data-ds]');if(d){DS=d.dataset.ds;document.documentElement.dataset.dial=DS;store.set('dial',DS);paintSpot()}const q=e.target.closest('[data-bb]');if(q){BB=q.dataset.bb;document.documentElement.dataset.bub=BB;store.set('fan',BB);paintSpot()}};
+// 翻面只換 class，不重畫，翻轉動畫才看得到
+function flipCard(){qrBig=!qrBig;if(qrBig)learn('card');const c=$('qrc');c.classList.toggle('flip',qrBig);c.classList.toggle('calm',(HINT.card||0)>=3);c.setAttribute('aria-pressed',qrBig);c.setAttribute('aria-label',`借書證，${qrBig?'翻回正面':'翻面放大 QR Code'}`);c.querySelector('.pc-f').setAttribute('aria-hidden',qrBig);c.querySelector('.pc-b').setAttribute('aria-hidden',!qrBig)}
+$('dbody').onkeydown=e=>{if(e.target.id==='qrc'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();flipCard()}};
+$('dbody').onchange=e=>{if(e.target.id==='avf'&&e.target.files[0]){avMenu=false;pickPhoto(e.target.files[0])}};
+function drawer(on){$('drawer').classList.toggle('on',on);$('drawer').setAttribute('aria-hidden',!on);$('veil').hidden=!on;$('tab').hidden=on;S.classList.toggle('under',on);if(on)$('dclose').focus();else{qrBig=false;avMenu=false;paintSpot();$('tab').focus()}}
 $('tab').onclick=()=>drawer(true);$('veil').onclick=()=>drawer(false);$('dclose').onclick=()=>drawer(false);
 $('drawer').onkeydown=e=>{if(e.key==='Escape')drawer(false)};
 
-paintToday();paintWeek();paintMonth();setSem(si,true);paintBar();mark();show();paintSpot();applyHints();
+/* ---------- 左下方形「課程討論」 ---------- */
+// 第一層照使用者會想看的順序：我的課 → 本系（可換科系）→ 通識 → 其他（體育）；四類放在右下輪盤上切換，操作和學期輪盤一樣
+// 討論是討論串：每門課一串一串的文，可以發文、留言，發文時可以順便給神佛普拉刀；全部是範例資料，自己發的存在手機裡
+const DISC=['我的','本系','通識','其他'],MYDEPT='機械工程';
+const DEPT={機械工程:[['材料力學','周志偉','大二'],['熱力學','許家銘','大二'],['機構學','鄭宏仁','大三'],['自動控制','蔡明哲','大三'],['有限元素法','楊子賢','大四'],['機器人學','謝承翰','大四']],
+ 電機工程:[['電路學','林冠宇','大一'],['訊號與系統','陳柏諺','大二'],['電力電子','郭正雄','大三']],
+ 資訊工程:[['資料結構','何佳蓉','大二'],['演算法','羅仕傑','大三'],['作業系統','曾振宇','大三']],
+ 化學工程與材料工程:[['有機化學','潘淑芬','大二'],['單元操作','江俊賢','大三']]};
+const GEN=[['心理學概論','蘇怡君'],['生活中的法律','葉建志'],['電影與人生','邱詩涵'],['台灣史','簡志豪'],['天文學入門','莊文彬'],['投資理財','賴美華'],['日文入門','高橋由美']];
+const PE=[['羽球','彭國威'],['游泳','游雅雯'],['桌球','鍾志明'],['體適能','范姿穎'],['瑜珈','杜欣怡']];
+// 自己這學期的課寫好幾串；其他課從通用的題目挑，數字用課名算，每次打開都一樣
+const TH={
+ 動力學:[['期中考範圍比上課多很多','第 1 到 6 章全考，有一題是講義最後的補充，大家怎麼準備？','刀',120,['考古題那題幾乎一樣','補充那題我也沒寫出來','王老師說期末會比較簡單']],
+  ['王老師講解很清楚','每題都會畫自由體圖，跟著寫筆記就看得懂。','神',1500,['推，比課本好懂','但進度有點快']],
+  ['作業可以兩人一組嗎？','第四份作業題目很長，想問可不可以分工。','',4300,['上課有說只能自己交']]],
+ 電子學:[['實驗報告格式','老師要的是 IEEE 格式還是學校的範本？','',300,['學校範本就可以','封面不用彩色']],
+  ['偏壓電路完全聽不懂','有人整理過 BJT 偏壓的筆記嗎？','拉',2900,['我可以分享，私訊','B 站有影片講得很好','先把直流分析弄懂']]],
+ 流體力學:[['黃老師給分甜嗎','聽說期末占 50%。','佛',900,['平時有交作業就不會太低','期末難，但會調分']]],
+ 機械設計:[['期末專題組隊','還缺一個會畫 SolidWorks 的。','',60,['+1','我會，私你']]],
+ 英文:[['口說考試怎麼考','兩人一組對話，還是自己講？','普',2000,['兩人一組，題目前一週給']]],
+ 藝術欣賞:[['每週心得要寫多少字','300 字就夠嗎？','神',5000,['300 字就好，老師很佛','有去看展可以加分']]],
+ 電腦繪圖:[['軟體版本','學校電腦是 2024 版，家裡用 2025 開得起來嗎？','',700,['高版本存的檔低版本開不了','記得另存舊版']]],
+ 熱傳學:[['值得選嗎','大三想選，修過的說一下作業量。','佛',8000,['每兩週一份，還好','跟流體一起修比較好懂']]]};
+const GT=[['值得修嗎？','想修這門，修過的可以說一下作業量和給分嗎？'],['考試怎麼考','期中期末各占多少？考古題有用嗎？'],['修完心得','整體來說還不錯，分享給之後要修的人。'],['會點名嗎','想知道缺幾次會被扣分。']];
+const GR=['作業每週一份，認真寫不難','考古題有用，題型差不多','會點名，大概三次','老師人很好，有問題下課問','期末報告占很重','推，學到很多','分數普通，但不會被當'];
+const hs=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+let MY={th:{},re:{}};try{MY=Object.assign(MY,JSON.parse(store.get('forum')||'{}'))}catch(e){}
+const saveMy=()=>store.set('forum',JSON.stringify(MY));
+function threads(n){const h=hs(n),base=TH[n]||[0,1].map(i=>{const g=GT[(h+i*3)%GT.length],k=h>>(i*4);return[g[0],g[1],i===1?RATES[k%4]:'',300+(k%90)*97,GR.filter((x,j)=>(k>>j)&1).slice(0,4)]});
+  const now=Date.now();
+  return[...base.map(([t,b,r,m,re],i)=>({id:n+'#'+i,t,b,r,m,re:re.map((x,j)=>[x,Math.max(1,Math.round(m*(re.length-j)/(re.length+1)))])})),
+    ...(MY.th[n]||[]).map((x,i)=>({id:n+'#my'+i,t:x.t,b:x.b,r:x.r,m:Math.max(0,Math.round((now-x.ts)/6e4)),re:[],mine:true}))]
+   .map(x=>{const add=(MY.re[x.id]||[]).map(([y,ts])=>[y,Math.max(0,Math.round((now-ts)/6e4)),true]);x.re=[...x.re,...add].sort((a,b)=>b[1]-a[1]);return x})}
+// 評價人數用課名算一組範例數字，再加上自己發文時給的評價；平均照 神 5 到 刀 1 算，越接近神越好過
+function votes(n){const h=hs(n),pk=[0,1,1,2,2,3,4][h%7],c=[0,1,2,3,4].map(i=>((h>>(i*4))&7)+(i===pk?22:Math.abs(i-pk)===1?8:1));(MY.th[n]||[]).forEach(x=>{if(x.r)c[RATES.indexOf(x.r)]++});return c}
+const score=c=>c.reduce((s,x,i)=>s+x*(5-i),0)/c.reduce((s,x)=>s+x,0);
+const grade=c=>RATES[5-Math.round(score(c))];
+const rt=r=>r?`<b${r==='神'?' class="god"':''}>${r}</b>`:'';
+const ago=m=>m<1?'剛剛':m<60?m+' 分鐘前':m<1440?Math.round(m/60)+' 小時前':Math.round(m/1440)+' 天前';
+let di=0,fdept=MYDEPT,fsort='pass',tsort='hot',fv='list',fc=null,ft=null,frate='';
+function fList(){if(di===0)return COURSES.map(c=>({n:c.n,tc:c.tc,g:c.cat}));
+  if(di===1)return DEPT[fdept].map(([n,tc,g])=>({n,tc,g}));
+  const xs=(di===2?GEN:PE).map(([n,tc])=>({n,tc}));
+  return di===2?xs.sort((a,b)=>fsort==='pass'?score(votes(b.n))-score(votes(a.n)):threads(b.n).length-threads(a.n).length):xs}
+const tcOf=n=>(fList().find(x=>x.n===n)||{}).tc||'';
+function fRow(x){const ts=threads(x.n),last=[...ts].sort((a,b)=>a.m-b.m)[0],c=votes(x.n);
+  return`<button class="frow" data-fc="${x.n}"><div class="l1"><b>${x.n}</b><span class="mono">${rt(grade(c))} · ${c.reduce((s,y)=>s+y)} 人</span></div><div class="s">${x.tc} 老師 · ${ts.length} 篇${last?' · 最新：'+last.t:''}</div></button>`}
+function paintForum(){let h,back='';
+  if(fv==='list'){const xs=fList(),T=['我這學期的課',fdept+(fdept===MYDEPT?'（本系）':''),'通識','體育'][di];
+    h=`<h1>${T}</h1>`;
+    if(di===1)h+=`<div class="fbar"><select id="fdept" aria-label="科系">${Object.keys(DEPT).map(d=>`<option${d===fdept?' selected':''}>${d}</option>`).join('')}</select><span class="s">${fdept===MYDEPT?'之後可以選的課':'他系的課'}</span></div>`;
+    if(di===2)h+=`<div class="fbar"><span class="seg3" role="group" aria-label="排序">${[['pass','好過'],['hot','熱門']].map(([k,t])=>`<button data-fs="${k}" class="${fsort===k?'on':''}" aria-pressed="${fsort===k}">${t}</button>`).join('')}</span><span class="s">${fsort==='pass'?'照神佛普拉刀平均':'照文章數'}</span></div>`;
+    h+=di===1?['大一','大二','大三','大四'].map(g=>{const ys=xs.filter(x=>x.g===g);return ys.length?`<div class="lbl fg">${g}</div>`+ys.map(fRow).join(''):''}).join(''):`<div class="fl">${xs.map(fRow).join('')}</div>`;
+    h+=`<div class="mono" style="margin-top:14px" data-lv="4" data-hint="disc">右下輪盤可以換：我的、本系、通識、其他</div>`}
+  else if(fv==='course'){const ts=threads(fc).sort((a,b)=>tsort==='hot'?b.re.length-a.re.length||a.m-b.m:a.m-b.m),c=votes(fc),N=c.reduce((s,x)=>s+x);back=['← '+DISC[di],'list'];
+    h=`<h1>${fc}</h1><div class="s fsub">${tcOf(fc)} 老師 · 平均 ${rt(grade(c))} · ${N} 人評價</div><div class="mono">${RATES.map((r,i)=>`${r} ${Math.round(c[i]/N*100)}%`).join(' · ')}</div>
+      <div class="fbar"><span class="seg3" role="group" aria-label="排序">${[['hot','熱門'],['new','最新']].map(([k,t])=>`<button data-ts="${k}" class="${tsort===k?'on':''}" aria-pressed="${tsort===k}">${t}</button>`).join('')}</span><button class="add" data-new>＋ 發文</button></div>`;
+    h+=ts.map(x=>`<button class="frow" data-ft="${x.id}"><div class="l1"><b>${x.t}</b><span class="mono">${x.re.length} 回</span></div><div class="s">${x.r?rt(x.r)+' · ':''}${x.mine?'我 · ':''}${ago(x.m)} · ${x.b}</div></button>`).join('')}
+  else if(fv==='thread'){const x=threads(fc).find(y=>y.id===ft);back=['← '+fc,'course'];
+    h=`<h1 class="fh">${x.t}</h1><div class="mono fsub">${x.r?rt(x.r)+' · ':''}${x.mine?'我':'匿名'} · ${ago(x.m)}</div><p class="fp">${x.b}</p>
+      <div class="lbl fg">${x.re.length} 則留言</div>${x.re.map(([y,m,me])=>`<div class="fre"><span>${y}</span><span class="mono">${me?'我 · ':''}${ago(m)}</span></div>`).join('')}
+      <form class="fform" data-f="re"><input name="b" placeholder="留言" required aria-label="留言"><button class="add" type="submit">送出</button></form>`}
+  else{back=['← '+fc,'course'];
+    h=`<h1>在${fc}發文</h1><form class="fform col" data-f="new"><input name="t" placeholder="標題，例如期中考怎麼準備" required aria-label="標題"><textarea name="b" rows="5" placeholder="內容" required aria-label="內容"></textarea>
+      <div class="crate"><span>順便評價（可不選）</span><span class="seg3" role="group" aria-label="評價">${RATES.map(r=>`<button type="button" data-fr="${r}" class="${frate===r?'on':''}${r==='神'?' god':''}" aria-pressed="${frate===r}">${r}</button>`).join('')}</span></div>
+      <button class="add" type="submit">發文</button></form>`}
+  $('fback').hidden=!back;$('fcrumb').hidden=!!back;if(back){$('fback').textContent=back[0];$('fback').dataset.to=back[1]}
+  $('fbody').innerHTML=h;applyHints()}
+function fGo(v){fv=v;if(v!=='new')frate='';paintForum();$('fbody').scrollTop=0}
+// 輪盤選到一類就回到那一類的清單
+function setDisc(i){di=Math.max(0,Math.min(DISC.length-1,i));fv='list';paintForum()}
+$('fbody').onclick=e=>{const q=s=>e.target.closest(s);let b;
+  if(b=q('[data-fc]')){fc=b.dataset.fc;fGo('course')}
+  else if(b=q('[data-ft]')){ft=b.dataset.ft;fGo('thread')}
+  else if(b=q('[data-fs]')){fsort=b.dataset.fs;paintForum()}
+  else if(b=q('[data-ts]')){tsort=b.dataset.ts;paintForum()}
+  else if(q('[data-new]'))fGo('new');
+  else if(b=q('[data-fr]')){frate=frate===b.dataset.fr?'':b.dataset.fr;document.querySelectorAll('[data-fr]').forEach(x=>{x.classList.toggle('on',x.dataset.fr===frate);x.setAttribute('aria-pressed',x.dataset.fr===frate)})}};
+$('fbody').onchange=e=>{if(e.target.id==='fdept'){fdept=e.target.value;paintForum()}};
+$('fbody').onsubmit=e=>{e.preventDefault();const f=e.target,d=Object.fromEntries(new FormData(f));
+  if(f.dataset.f==='new'){(MY.th[fc]=MY.th[fc]||[]).push({t:d.t.trim(),b:d.b.trim(),r:frate,ts:Date.now()});saveMy();tsort='new';fGo('course')}
+  else{(MY.re[ft]=MY.re[ft]||[]).push([d.b.trim(),Date.now()]);saveMy();paintForum()}};
+$('fback').onclick=()=>fGo($('fback').dataset.to);
+// 打開時蓋住四頁，左下兩個鈕先收起來；右下輪盤換成四類。關掉時輪盤換回這一頁原本的
+function forum(on){$('forum').hidden=!on;$('tab').hidden=on;$('sq').hidden=on;
+  if(on){fGo('list');setKind('disc');$('fclose').focus()}
+  else{setKind(Math.round($('app').scrollTop/$('app').clientHeight)===3?'sem':'course');$('sq').focus()}}
+$('sq').onclick=()=>forum(true);$('fclose').onclick=()=>forum(false);
+$('forum').addEventListener('keydown',e=>{if(e.key!=='Escape'||e.target.matches('input,textarea'))return;if(fv==='list')forum(false);else fGo($('fback').dataset.to)});
+
+paintToday();paintWeek();paintMonth();setSem(si,true);paintBar();mark();show();paintTab();paintSpot();applyHints();
 if(home)$('pg'+home).scrollIntoView();
 </script>
