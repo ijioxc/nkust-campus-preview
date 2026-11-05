@@ -844,7 +844,7 @@ const SET=[['文字量',()=>({full:'完整',std:'標準',min:'精簡'})[TL],text
 const SCHOOL=`<svg viewBox="0 0 60 70" role="img" aria-label="學校系統照片（範例）"><rect width="60" height="70" fill="#c9ced6"/><circle cx="30" cy="27" r="12" fill="#8a919c"/><path d="M8 70c2-15 11-22 22-22s20 7 22 22z" fill="#8a919c"/></svg>`;
 let AV=store.get('avatar');
 const avatar=()=>AV?`<img src="${AV}" alt="我的頭貼">`:SCHOOL;
-const paintTab=()=>{$('tab').innerHTML=avatar();$('sq').innerHTML=SQICON};
+const paintTab=()=>{};
 function pickPhoto(f){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),z=240,s=Math.min(im.width,im.height);c.width=c.height=z;c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,z,z);AV=c.toDataURL('image/jpeg',.85);store.set('avatar',AV);paintTab();paintSpot()};im.src=r.result};r.readAsDataURL(f)}
 let open='',qrBig=false,avMenu=false;
 const meRow=([t,m,body,url])=>{const mm=typeof m==='function'?m():m;
